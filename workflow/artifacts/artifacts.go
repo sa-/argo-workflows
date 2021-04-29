@@ -3,6 +3,7 @@ package executor
 import (
 	"context"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 
 	wfv1 "github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
 	"github.com/argoproj/argo-workflows/v3/workflow/artifacts/artifactory"
@@ -31,6 +32,7 @@ type NewDriverFunc func(ctx context.Context, art *wfv1.Artifact, ri resource.Int
 
 // NewDriver initializes an instance of an artifact driver
 func NewDriver(ctx context.Context, art *wfv1.Artifact, ri resource.Interface) (ArtifactDriver, error) {
+	log.WithField("art", wfv1.MustJSON(art)).Info("ISSUE #5733 - 1")
 	if art.S3 != nil {
 		var accessKey string
 		var secretKey string
@@ -91,6 +93,7 @@ func NewDriver(ctx context.Context, art *wfv1.Artifact, ri resource.Interface) (
 		return &gitDriver, nil
 	}
 	if art.Artifactory != nil {
+		log.WithField("art", wfv1.MustJSON(art)).Info("ISSUE #5733 - 2")
 		usernameBytes, err := ri.GetSecret(ctx, art.Artifactory.UsernameSecret.Name, art.Artifactory.UsernameSecret.Key)
 		if err != nil {
 			return nil, err

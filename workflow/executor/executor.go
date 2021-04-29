@@ -267,6 +267,7 @@ func (we *WorkflowExecutor) SaveArtifacts(ctx context.Context) error {
 	}
 
 	for i, art := range we.Template.Outputs.Artifacts {
+		log.WithField("art", wfv1.MustJSON(art)).Info("ISSUE #5733 - 6")
 		err := we.saveArtifact(ctx, common.MainContainerName, &art)
 		if err != nil {
 			return err
@@ -289,11 +290,13 @@ func (we *WorkflowExecutor) saveArtifact(ctx context.Context, containerName stri
 		}
 		return err
 	}
+	log.WithField("art", wfv1.MustJSON(art)).Info("ISSUE #5733 - 5")
 	return we.saveArtifactFromFile(ctx, art, fileName, localArtPath)
 }
 
 // fileBase is probably path.Base(filePath), but can be something else
 func (we *WorkflowExecutor) saveArtifactFromFile(ctx context.Context, art *wfv1.Artifact, fileName, localArtPath string) error {
+	log.WithField("art", wfv1.MustJSON(art)).Info("ISSUE #5733 - 4")
 	if !art.HasKey() {
 		key, err := we.Template.ArchiveLocation.GetKey()
 		if err != nil {
@@ -579,6 +582,7 @@ func (we *WorkflowExecutor) newDriverArt(art *wfv1.Artifact) (*wfv1.Artifact, er
 
 // InitDriver initializes an instance of an artifact driver
 func (we *WorkflowExecutor) InitDriver(ctx context.Context, art *wfv1.Artifact) (artifact.ArtifactDriver, error) {
+	log.WithField("art", wfv1.MustJSON(art)).Info("ISSUE #5733 - 3")
 	driver, err := artifact.NewDriver(ctx, art, we)
 	if err == artifact.ErrUnsupportedDriver {
 		return nil, errors.Errorf(errors.CodeBadRequest, "Unsupported artifact driver for %s", art.Name)
