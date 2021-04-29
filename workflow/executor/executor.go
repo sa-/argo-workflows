@@ -302,12 +302,17 @@ func (we *WorkflowExecutor) saveArtifactFromFile(ctx context.Context, art *wfv1.
 		if err != nil {
 			return err
 		}
-		if err = art.SetType(we.Template.ArchiveLocation.Get()); err != nil {
+		log.WithField("art", wfv1.MustJSON(art)).Info("ISSUE #5733 - 1.1")
+		if err := art.Relocate(we.Template.ArchiveLocation); err != nil {
 			return err
 		}
+		log.WithField("art", wfv1.MustJSON(art)).Info("ISSUE #5733 - 1.2")
 		if err := art.SetKey(path.Join(key, fileName)); err != nil {
 			return err
 		}
+		log.WithField("art", wfv1.MustJSON(art)).Info("ISSUE #5733 - 1.3")
+	} else {
+		log.WithField("art", wfv1.MustJSON(art)).Info("ISSUE #5733 - 1.4")
 	}
 	driverArt, err := we.newDriverArt(art)
 	if err != nil {
