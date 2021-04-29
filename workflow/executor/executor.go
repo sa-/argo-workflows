@@ -134,7 +134,6 @@ func (we *WorkflowExecutor) HandleError(ctx context.Context) {
 // LoadArtifacts loads artifacts from location to a container path
 func (we *WorkflowExecutor) LoadArtifacts(ctx context.Context) error {
 	log.Infof("Start loading input artifacts...")
-
 	for _, art := range we.Template.Inputs.Artifacts {
 
 		log.Infof("Downloading artifact: %s", art.Name)
@@ -303,7 +302,7 @@ func (we *WorkflowExecutor) saveArtifactFromFile(ctx context.Context, art *wfv1.
 			return err
 		}
 		log.WithField("art", wfv1.MustJSON(art)).Info("ISSUE #5733 - 1.1")
-		if err := art.Relocate(we.Template.ArchiveLocation); err != nil {
+		if err = art.SetType(we.Template.ArchiveLocation.Get()); err != nil {
 			return err
 		}
 		log.WithField("art", wfv1.MustJSON(art)).Info("ISSUE #5733 - 1.2")
@@ -543,7 +542,11 @@ func (we *WorkflowExecutor) SaveLogs(ctx context.Context) (*wfv1.Artifact, error
 	if err != nil {
 		return nil, err
 	}
-	art := &wfv1.Artifact{Name: "main-logs"}
+	art := &wfv1.Artifact{
+		Name:             "main-logs",
+		ArtifactLocation: *we.Template.ArchiveLocation.DeepCopy(),
+	}
+	log.WithField("art", wfv1.MustJSON(art)).Info("ISSUE #5733 - 3.1")
 	err = we.saveArtifactFromFile(ctx, art, fileName, mainLog)
 	if err != nil {
 		return nil, err
